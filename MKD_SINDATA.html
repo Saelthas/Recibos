@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <script language="JavaScript" type="text/javascript"></script>
+    <title></title>
+    <script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
+   
+    
+        <!--<script type="text/javascript" src="cordova.js"></script>-->
+        <!--<script type="text/javascript" src="js/index.js"></script>-->
+
+    <script type="text/javascript">
+    
+    jQuery(document).ready(function(){
+    //alert("alerta");
+    
+            jQuery('#guardar').on('click', function(e){
+                //alert("Registro Adicionado");
+                //Obtienes el contexto del canvas, y lees la imagen codificada en Base64:
+                //console.log(urlEnvio);
+                
+                var credencial=$('#credencial').val ();
+                var nombre=$('#nombre').val ();
+                var telefono =$('#telefono').val ();
+                var hab =1;
+                //var empresa=$('#empresa').val ();
+                //var telEmp =$('#Tel-emp').val ();
+                //var correo=$('#correo').val ();
+                //var oferta=$('#oferta').val ();
+
+                /*console.log('Credencial: '+credencial);
+                console.log('\n');
+                console.log('Nombre: '+nombre);
+                console.log('\n');
+                console.log('Apellido: '+apellido);
+                console.log('\n');
+                console.log('C.I.: '+ci);
+                console.log('\n');
+                console.log('empresa: '+empresa);
+                console.log('\n');
+                console.log('Telefono Empresa: '+telEmp);
+                console.log('\n');
+                console.log('Correo Empresa: '+correoEmp);
+                console.log('\n');
+                console.log('Oferta: '+oferta);
+                console.log('\n');*/
+
+
+                //console.log(nombre);
+                var datos = {
+                    //"ajaxEnvio": urlEnvio,
+                    "credencial": credencial,
+                    //"nombre": nombre,
+                    //"telefono": telefono,
+                    //"hab": hab,
+                    //"empresa": empresa,
+                    //"telEmp": telEmp,
+                    //"correo": correo,
+                    //"oferta": oferta,
+
+                };
+                //Envías la imagen como un post normal a una página ASP, PHP, servicio web, etc.
+                jQuery.ajax({
+                url: "http://192.168.128.51/p/b/beneficiarioJSON.php",
+                    
+                //url: "http://192.161.0.20/p/listarSIN.php",
+                type: "post",
+                data: datos,
+                beforeSend: function () {
+                        //$("#resultado").html("Procesando, espere por favor...");
+                },
+                success:  function (response) {
+                    lista = $.parseJSON(response);
+                    for(var i in lista)
+                    {
+                        console.log(lista[i]);
+                        //console.log(lista[i].CLIENTEID+" , "+lista[i].NIT+" , "+lista[i].CLIENTE+" , "+lista[i].DIRECCION+" , "+lista[i].TELEFONO+" , "+lista[i].NIT+" , "+lista[i].USERID+" , "+lista[i].ZONAID);
+                        //console.log(lista[i].NIT);
+                        //console.log(lista[i].CLIENTE);
+                        //console.log(lista[i].USERID);
+                    }
+                        //$("#resultado").html(response);
+                        //alert(response);
+                        
+                }
+                });
+            });
+    });
+    </script>
+    
+</head>
+<body>
+<div class="caja">
+
+<h1 class="titu">Formulario Fan FIPAZ</h1>
+<form action="" method="POST" enctype="multipart/form-data">
+
+    <input type="text" name="credencial" id="credencial" placeholder="Credencial :"  autofocus/>
+    <input type="text" name="nombre" id="nombre" placeholder="Nombre y Apellidos:" />
+    <input type="text" name="telefono" id="telefono" placeholder="Telefono :" />
+   <!--  <input type="hab" name="hab" id="hab" placeholder="" /> -->
+    <div id="botonera"> 
+    <input id="guardar" class="btn" type="button" name="generar" value="Registro">
+
+    </div>
+
+    <div>
+        <span id="resultado"></span>
+    </div>
+
+</form>
+
+</body>
+</html>
+
+

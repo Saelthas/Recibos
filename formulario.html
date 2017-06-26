@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html ng-app="formu">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+  <title></title>
+  <link rel="stylesheet" href="">
+  <script src="jquery.min.js" type="text/javascript" charset="utf-8" ></script>
+    <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/angular.min.js"></script>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <script type="text/javascript" charset="utf-8" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/log.js"></script>
+    <link href="css/jumbotron-narrow.css" rel="stylesheet">
+    <script type="text/javascript">
+    jQuery(document).ready(function($) {
+      saludo();
+      beneficiariosCB();
+      productoCB();
+      var farmaciaurl;
+      $.extend({
+          getUrlVars: function(){
+            var vars = [], hash;
+            var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('|');
+            console.log(hashes);
+            for(var i = 0; i < hashes.length; i++)
+            {
+              hash = hashes[i].split('=');
+              vars.push(hash[0]);
+              vars[hash[0]] = hash[1];
+            }
+            return vars;
+          },
+          getUrlVar: function(name){
+            return $.getUrlVars()[name];
+          }
+        });
+      farmaciaurl = $.getUrlVar('farmacia');
+      farmaciaurl= decodeURI(farmaciaurl);
+      farmaciacodurl = $.getUrlVar('codigo');
+      farmaciacodurl= decodeURI(farmaciacodurl);
+      console.log("farmacia: "+farmaciaurl);
+      console.log("codigo: "+farmaciacodurl);
+      $("#fActual").html('<strong>'+farmaciaurl+'</strong>');
+      $("#fCActual").html('<strong>'+farmaciacodurl+'</strong>');
+      var db = window.openDatabase("markdisdb", "1.0", "Cordova Demo", 200000);
+        db.transaction(
+            function rescdesc(tx) {
+                tx.executeSql('SELECT * FROM Descuento ORDER BY DESC ASC', [],
+                  function lis(tx, results) {
+                              var len = results.rows.length;
+                                  console.log("hay: " + len + " descuentos para esta tablet.");
+                                  for (var i=0; i<len; i++){
+                                    if (results.rows.item(i).DESC==0) {
+                                       $("#selectDesc").append("<option  value='0'  style='width: 100px;'>"+results.rows.item(i).DESC+"%</option>")
+                                    }
+                                    else
+                                     {
+                                    $("#selectDesc").append("<option  value="+(results.rows.item(i).DESC/100)+"  style='width: 100px;'>"+results.rows.item(i).DESC+"%</option>")
+                                     }
+                                     console.log("Row = " + i + " Descuento = " + results.rows.item(i).DESC);
+                                  }
+                  },errorCB);
+            }, errorCB);
+      jQuery('#hacerpedido').on('click', function(e){
+        var ultimoid;
+        var codigobenef= $("#codbenef").text();
+        console.log('codigo:'+ codigobenef);
+        var codigocliente= $("#codcli").text();
+        console.log('codigo Cliente:'+ codigocliente);
+        var benefnit= $("#benefnit").text();
+        console.log('nit beneficiario:'+ benefnit);
+        var benefnombre= $("#benefnomb").text();
+        console.log('nombre beneficiario:'+ benefnombre);
+        var total= $("#total").text();
+        console.log('codigo:'+ total);
+        var descuento= $("#descuento").text();
+        console.log('codigo Cliente:'+ descuento);
+        console.log('Datos para la factura:');
+        console.log('nit beneficiario:'+ benefnit);
+        var benefnombre= $("#benefnomb").text();
+          var fecha= new Date();
+          var fecha2= new Date();
+          var res = fecha.toISOString().slice(0,10).replace(/-/g,"");
+          var fechaAMD = fecha.toISOString().substring(0,10);
+          var dosdigitosmes = ((fecha.getMonth().length+1) === 1)? (fecha.getMonth()+1) : '0' + (fecha.getMonth()+1);
+          var fechaActualDMAqr = fecha.getDate() + "/" + dosdigitosmes + "/" + fecha.getFullYear();
+          var fechaActualAMDgui = fecha.getFullYear() + "-" + dosdigitosmes + "-" + fecha.getDate();
+            console.log(fechaActualDMAqr);
+            console.log(fechaActualAMDgui);
+        var date = new Date();
+        var dia = date.getDay();
+        var mes = date.getMonth();
+        var anho = date.getFullYear();
+        var fechaemsionguion=fechaActualAMDgui;
+        console.log("fecha: "+fechaemsionguion);
+        var fechaemsion=fechaActualAMDgui;
+        console.log("fecha: "+fechaemsion);
+        var fechavencimiento=fechaActualAMDgui;
+        console.log("fecha vencimiento: "+fechavencimiento);
+        var clienteid= $("#codcli").text();
+        console.log('codigo Cliente:'+ clienteid);
+        var vendedorid= $("#codusuario").text();
+        console.log('codigo Vendedor:'+ vendedorid);
+        var beneficiarioid= $("#codbenef").text();
+        console.log('ID beneficiario:'+ beneficiarioid);
+        var db = window.openDatabase("markdisdb", "1.0", "Cordova Demo", 200000);
+        db.transaction(
+            function insefact(tx) {
+                tx.executeSql('CREATE TABLE IF NOT EXISTS Factura (FACTURAID INTEGER PRIMARY KEY   AUTOINCREMENT, NIT, FECHAEMISION,FECHAVENCIMIENTO,CLIENTEID, VENDEDORID, BENEFICIARIOID,SUBIDO INTEGER DEFAULT 0)');
+                tx.executeSql('INSERT INTO Factura (NIT, FECHAEMISION,FECHAVENCIMIENTO,CLIENTEID, VENDEDORID, BENEFICIARIOID) VALUES ("'+benefnit
+                  +'","'+fechaemsion+'","'+fechavencimiento+'","'+clienteid+'","'+vendedorid+'","'+beneficiarioid+'")');
+                console.log("CONSULTA: "+tx.executeSql('select * from sqlite_sequence;'));
+                tx.executeSql('select * from sqlite_sequence', [],
+                  function lis(tx, results) {
+                              var len = results.rows.length;
+                                  console.log("ultimo valor recibido table: " + len + " rows found.");
+                                  for (var i=0; i<len; i++){
+                                      ultimoid=results.rows.item(i).seq;
+                                      console.log("Row = " + i + " table = " + results.rows.item(i).name + " id =  " + results.rows.item(i).seq);
+                                  }
+                  }
+                  ,errorCB);
+            }, errorCB);
+        console.log('detalle pedido para la factura: '+JSON.stringify(detpedido));
+        var db = window.openDatabase("markdisdb", "1.0", "Cordova Demo", 200000);
+                        db.transaction(
+                          function insefarm(tx) {
+                              tx.executeSql('CREATE TABLE IF NOT EXISTS Detalle (PRODUCTOID  TEXT,FACTURAID INTEGER,CANTIDAD  INTEGER,PRECIO  REAL,DESCUENTO REAL)');
+                              for(var i=0;i<(detpedido.length);i++)
+                                {
+                                  tx.executeSql("INSERT INTO Detalle (PRODUCTOID, FACTURAID, CANTIDAD,PRECIO, DESCUENTO) VALUES (?,?,?,?,?)",[detpedido[i].cod, ultimoid ,detpedido[i].cant,detpedido[i].preci,detpedido[i].descu]);
+                                  console.log('INSERT INTO Detalle (PRODUCTOID, FACTURAID, CANTIDAD,PRECIO, DESCUENTO) VALUES ("'+detpedido[i].cod+'","'+ultimoid+'","'+detpedido[i].cant+'","'+detpedido[i].preci+'","'+detpedido[i].descu+'")');
+                                  console.log('cod:'+detpedido[i]);
+                                }
+                              }, errorCB);
+        setTimeout("location.href='firma.html'", 500);
+      });
+    });
+    </script>
+</head>
+<body>
+  <div class="container">
+      <div class="header clearfix">
+        <nav>
+          <ul class="nav nav-pills pull-right">
+            <li role="presentation"><a href="pedido.html">Inicio</a></li>
+            <!--<li role="presentation"><a href="#">Acerca de...</a></li>
+            <li role="presentation"><a href="#">otra opcion</a></li>-->
+          </ul>
+          <a class="navbar-brand" href="#">
+            <img alt="Brand" src="img/icon.ico" height="50" width="100">
+          </a>
+        </nav>
+        <h3 class="text-muted">MarkDis Bolivia</h3>
+        <p class="text-muted">Hola <label id="usuario"></label> <label id="codusuario"></label></p>
+  </div>
+  <div ng-controller="formuController">
+  <!-- ELEGIR BENEFICIARIO-->
+            <div>
+                  <br>
+                  <h1 class="text-center">Seleccionar Beneficiario</h1>
+            </div>
+                      <h1>codigo:<label id="codbenef">{{benef.beneficiarioID}}</label></h1>
+                      <h2>codigo cliente: <label id="codcli">{{benef.clienteID}}</label></h2>
+                      <h3>Nit: <label id="benefnit">{{benef.nit}}</label> </h3>
+                      <h4>Nombre: <label id="benefnomb">{{benef.nombre}}</label></h4>
+            <form class="navbar-form " role="search">
+                 <label> </label>
+                <div class="row">
+                    <div class="col-lg-15">
+                      <div class="input-group">
+                                    <span class="input-group-btn">
+                                    <!-- agregar -->
+                                    <input type="search" ng-model="busquedaB" class="form-control"placeholder="beneficiario?">
+                                    <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button" ng-click="buscarbenf()">Buscar!</button>
+                                    </span>
+                                    </span>
+                                    <span class="input-group-btn">
+                                        <!-- benef -->
+                                        <select required class="form-control" id="lista"ng-model="benef" ng-options="y.nombre for (x, y) in beneficiario | filter:busquedaB"style="width: 250px;">
+                                        </select>
+                                    </span>
+                      </div>
+                    </div>
+                    <br><br>
+                </div>
+                <br>
+              </form>
+      <!-- ELEGIR PRODUCTOS-->
+  <div>
+        <h1 class="text-center">Seleccionar Productos</h1>
+        <h2 class="">Farmacia:</h2>
+        <h2>
+          <label id="fActual" style=" background-color: gold; color: green;"></label> <label id="fCActual"style="display:none;"></label>
+        </h2>
+  </div>
+  <br>
+    <select ng-model="producto" style="display:none;"ng-options="y.detalles for (x, y) in productos | filter:busqueda">
+    </select>
+    <h1>Producto seleccionado: {{producto.detalles}}</h1>
+    <h2>Codigo del producto: {{producto.productoID}}</h2>
+    <h3>Precio unitario: {{producto.precio}}</h3>
+    <form class="navbar-form " role="search">
+       <label> </label>
+      <div class="row">
+          <div class="col-lg-15">
+            <div class="input-group">
+                <input type="search" ng-model="busqueda" class="form-control"placeholder="Producto?">
+                <span class="input-group-btn">
+                <button class="btn btn-default" type="button" ng-click="buscarprod()" >Buscar producto</button>
+                </span>
+            </div>
+          </div>
+          <br>
+          <div class="col-lg-15">
+          <div class="input-group">
+              <table class="table table-striped">
+                <tr>
+                  <td>Producto</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td>Precio</td><td></td>
+                  <td>Cantidad</td>
+                  <td>Descuento</td>
+                </tr>
+              </table>
+          </div>
+            <div class="input-group">
+                          <span class="input-group-btn">
+                              <!-- Producto -->
+                              <select class="form-control" id="lista"ng-model="producto" ng-options="y.detalles for (x, y) in productos | filter:busqueda"style="width: 250px;">
+                              </select>
+                          </span>
+                              <select  class="form-control"ng-model="precii">
+                                <!-- Precio -->
+                                <option selected value="{{producto.precio}}"  style="width: 100px;">{{producto.precio}}</option>
+                              </select>
+                          <span class="input-group-btn">
+                            <!-- cantidad -->
+                            <input type="number" class="form-control"style="width: 100px;" min=1 ng-model="cand">
+                            </span>
+                            <!-- descuento -->
+                           <select  class="form-control" id ="selectDesc" ng-model="descuento" >
+                             <option value="0" selected style="width: 100px;" >0%</option>
+                           </select>
+                          <span class="input-group-btn">
+                          <!-- agregar -->
+                          <button class="btn btn-default" type="button" ng-click="agregar()">Agregar!</button>
+                          </span>
+            </div>
+          </div>
+          <br><br>
+      </div>
+      <br>
+    </form>
+    <!--
+              <table class="table">
+                <tr>
+                  <td>{{producto.productoID}}</td>
+                  <td>{{producto.detalles}}</td>
+                  <td>{{producto.precio}}</td>
+                  <td>{{cand}}</td>
+                  <td>{{descuento}}</td>
+                  <td>subtotal</td>
+                </tr>
+                <tr>
+                  <td><div ng-repeat="verllenado in llenado1">{{verllenado.cod}}</div></td>
+                  <td><div ng-repeat="verllenado in llenado1">{{verllenado.nom}}</div></td>
+                  <td><div ng-repeat="verllenado in llenado1">{{verllenado.preci}}</div></td>
+                  <td><div ng-repeat="verllenado in llenado1">{{verllenado.cant}}</div></td>
+                  <td><div ng-repeat="verllenado in llenado1">{{verllenado.descu}}%</div></td>
+                  <td><div ng-repeat="verllenado in llenado1">{{verllenado.monto}}</div></td>
+                </tr>
+              </table>
+               <br>
+              <br>
+              <div class="panel panel-default">-->
+              <!-- Default panel contents -->
+              <div class="panel panel-default">
+                  <div class="panel-body">
+                    <h3>Nota de Pedido</h3>
+                  </div>
+              <!-- Table -->
+                  <table class="table">
+                    <tr>
+                      <td>#</td>
+                      <td>Codigo</td>
+                      <td>producto</td>
+                      <td>precio</td>
+                      <td>cantidad</td>
+                      <td>descuento</td>
+                      <td>subtotal</td>
+                      <td>descuento BS</td>
+                    </tr>
+                    <tr ng-repeat="verllenado in llenado1">
+                      <td><strong>{{$index+1}}</strong></td>
+                      <td>{{verllenado.cod}}</td>
+                      <td>{{verllenado.nom}}</td>
+                      <td>{{verllenado.preci|number:2}}</td>
+                      <td>{{verllenado.cant}}</td>
+                      <td>{{verllenado.descu}}%</td>
+                      <td>{{verllenado.monto|number:2}}</td>
+                      <td>{{verllenado.descbs|number:2}}</td>
+                      <td><input type="button"class="btn btn-default btn-xs" ng-click="delete($index)" value="Eliminar"id=""></td>
+                    </tr>
+                    <!--<tr>
+                      <td><div ng-repeat="verllenado in llenado1">{{verllenado.cod}}</div></td>
+                      <td><div ng-repeat="verllenado in llenado1">{{verllenado.nom}}</div></td>
+                      <td><div ng-repeat="verllenado in llenado1">{{verllenado.preci}}</div></td>
+                      <td><div ng-repeat="verllenado in llenado1">{{verllenado.cant}}</div></td>
+                      <td><div ng-repeat="verllenado in llenado1">{{verllenado.descu}}%</div></td>
+                      <td><div ng-repeat="verllenado in llenado1">{{verllenado.monto}}</div></td>
+                      <td><div ng-repeat="verllenado in llenado1"><input type="button"class="btn btn-default btn-xs" name="" value="editar"id="{{verllenado.cod}}"></div></td>
+                    </tr>-->
+                    <tr>
+                      <th colspan="3"></th>
+                      <th >Total Descuento:</th>
+                      <th id="total">{{desc|number:2}}</th>
+                      <th >Total:</th>
+                      <th id="descuento">{{suma|number:2}}</th>
+                    </tr>
+                  </table>
+              </div>
+            <div class="btn-group" role="group" aria-label="...">
+              <a class="btn btn-lg btn-warning text-center"  id="hacerpedido">Hacer Pedido</a>
+            </div>
+          </div>
+  </div>
+  <br>
+  <br>
+  <br>
+  <br>
+  <!--<div>
+    <a class="btn btn-lg btn-success text-center"href="formulario.html">Aceptar</a>
+  </div>
+  <br>
+  <div class="btn-group">
+    <a class="btn btn-lg btn-danger text-center"href="formulario.html">Editar</a>
+    <a class="btn btn-lg btn-info text-center"href="formulario.html">Firma</a>
+    <a class="btn btn-lg btn-warning text-center"href="formulario.html">Hacer Pedido</a>
+  </div>-->
+  <footer class="footer">
+        <p>&copy; Markdis 2016</p>
+  </footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html ng-app="aplicacion">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    
+    <script src="jquery.min.js" type="text/javascript" charset="utf-8" ></script>
+    <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+    
+    <script type="text/javascript" charset="utf-8" src="js/angular.min.js"></script>
+    
+    
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/signin.css" rel="stylesheet">
+
+
+    <script type="text/javascript" charset="utf-8" src="js/log.js">
+    </script>
+    <script type="text/javascript">
+        jQuery(document).ready(function($) {
+          saludo();
+            jQuery('#guardar').on('click', function(e){
+              var date = new Date();
+              var dia = date.getDay();
+              var mes = date.getMonth();
+              var anho = date.getFullYear();
+              var hora = date.getHours();
+              var min = date.getMinutes();
+              var seg= date.getSeconds();
+              var nombre= dia+'-'+mes+'-'+anho+'-'+hora+'-'+min+'-'+seg;
+              navigator.screenshot.save(function(error,res){
+                  if(error){
+                    console.error(error);
+                  }else{
+                    console.log('ok',res.filePath); //should be path/to/myScreenshot.jpg 
+                    window.plugins.toast.show('Firma Guardada!', 'long', 'center', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+                    //setTimeout("location.href='pedido.html'", 2000);
+                  }
+              },'jpg',50,nombre);
+              setTimeout("location.href='pedido.html'", 500);
+            });  
+        });
+        
+    </script>
+  </head>
+  <body>    
+        <p class="text-muted">Ahora <label id="usuario"></label>, registra la firma del cliente.</p>
+ 
+        <button id="reset"class="btn btn-lg btn-danger text-center">Reset</button>
+        
+        <button id="guardar"class="btn btn-lg btn-info text-center">Guardar</button>
+        
+
+        <canvas id="myCanvas" width="600px" height="600px"style="border-style: groove;">(Your browser doesn't support canvas)</canvas>
+
+        
+
+        <script src="js/functions.js"></script>
+    
+    <script type="text/javascript" charset="utf-8" src="js/bootstrap.min.js"></script>
+    
+  </body>
+</html>

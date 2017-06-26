@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html ng-app="aplicacion">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    
+    <script src="jquery.min.js" type="text/javascript" charset="utf-8" ></script>
+    <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+    
+    <script type="text/javascript" charset="utf-8" src="js/angular.min.js"></script>
+    
+    
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/signin.css" rel="stylesheet">
+
+
+    <script type="text/javascript" charset="utf-8" src="js/log.js">
+
+    
+
+    </script>
+  </head>
+  <body>
+       <div class="container" ng-controller="contLogin">
+
+            <form class="form-signin"style="margin-top: -40px;">
+                <h2 class="form-signin-heading">Identifiquese</h2>
+                <br>
+                <label for="inputEmail" class="sr-only" >Email address</label>
+                <input type="text" id="inputEmail" class="form-control" placeholder="Usuario" required autofocus ng-model="email" required>
+                <label for="inputPassword" class="sr-only" >Password</label>
+                <input type="password" id="inputPassword" class="form-control" placeholder="Password" required ng-model="pass" required>
+                <button class="btn btn-lg btn-danger" role="button" data-toggle="popover" data-trigger="focus"  data-content=""type="submit" ng-click="verificar()">Entrar</button>
+                
+            </form>
+            
+        </div>
+        
+    <script>
+
+    </script>
+    <script type="text/javascript" charset="utf-8" src="js/bootstrap.min.js"></script>
+    </div>
+  </body>
+</html>

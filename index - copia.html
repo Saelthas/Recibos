@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html ng-app="markdis">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>Pantalla de logueo</title>
+
+    <!-- Bootstrap core CSS -->
+    <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/angular.min.js"></script>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <script src="js/jquery-2.1.4.min.js" type="text/javascript" charset="utf-8" async defer></script>
+
+    <!-- Custom styles for this template -->
+    <link href="css/signin.css" rel="stylesheet">
+
+    
+    <script type="text/javascript" charset="utf-8">
+
+	    // Wait for device API libraries to load
+	    //
+	    document.addEventListener("deviceready", onDeviceReady, false);
+
+	    // Populate the database
+	    //
+	    function populateDB(tx) {
+	        tx.executeSql('DROP TABLE IF EXISTS DEMO');
+	        tx.executeSql('CREATE TABLE IF NOT EXISTS DEMO (id unique, data)');
+	        tx.executeSql('INSERT INTO DEMO (id, data) VALUES (1, "First row")');
+	        tx.executeSql('INSERT INTO DEMO (id, data) VALUES (2, "Second row")');
+	        tx.executeSql('INSERT INTO DEMO (id, data) VALUES (3, "tres row")');
+	    }
+
+	    // Query the database
+	    //
+	    function queryDB(tx) {
+	        tx.executeSql('SELECT * FROM DEMO', [], querySuccess, errorCB);
+	    }
+
+	    // Query the success callback
+	    //
+	    function querySuccess(tx, results) {
+	        var len = results.rows.length;
+	        console.log("DEMO table: " + len + " rows found.");
+	        for (var i=0; i<len; i++){
+	            console.log("Row = " + i + " ID = " + results.rows.item(i).id + " Data =  " + results.rows.item(i).data);
+	        }
+	    }
+
+	    // Transaction error callback
+	    //
+	    function errorCB(err) {
+	        console.log("Error processing SQL: "+err.code);
+	    }
+
+	    // Transaction success callback
+	    //
+	    function successCB() {
+	        var db = window.openDatabase("Database", "1.0", "Cordova Demo", 200000);
+	        db.transaction(queryDB, errorCB);
+	    }
+
+	    // device APIs are available
+	    //
+	    function onDeviceReady() {
+	        var db = window.openDatabase("Database", "1.0", "Cordova Demo", 200000);
+	        db.transaction(populateDB, errorCB, successCB);
+	    }
+
+    </script>
+  </head>
+
+  <body>
+
+    <div class="container">
+
+      <form class="form-signin">
+        <h2 class="form-signin-heading">Identifiquese</h2>
+        <label for="inputEmail" class="sr-only">Email address</label>
+        <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+        <label for="inputPassword" class="sr-only">Password</label>
+        <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+        <!--<div class="checkbox">
+          <label>
+            <input type="checkbox" value="remember-me"> Remember me
+          </label>
+        </div>-->
+        <br>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Iniciar Sesion</button>
+      </form>
+
+    </div> <!-- /container -->
+  </body>
+</html>

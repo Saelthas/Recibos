@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html ng-app="bootstrapApp">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+  <title></title>
+  <link rel="stylesheet" href="">
+  <script src="jquery.min.js" type="text/javascript" charset="utf-8" ></script>
+    <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+    
+    <script type="text/javascript" charset="utf-8" src="js/angular.min.js"></script>
+    
+    
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    
+    <script type="text/javascript" charset="utf-8" src="js/bootstrap.min.js"></script>
+
+
+    <script type="text/javascript" charset="utf-8" src="js/log.js"></script>
+    <link href="css/jumbotron-narrow.css" rel="stylesheet">
+    <script type="text/javascript">
+    jQuery(document).ready(function($) {
+ saludo();
+ });
+    </script>
+</head>
+<body ng-controller="controladorDescuento">
+        
+        
+         <div class="container">
+            <div class="header clearfix">
+              <nav>
+                <ul class="nav nav-pills pull-right">
+                  <li role="presentation" class="active"><a href="gerencia.html">Inicio</a></li>
+                  
+                  <!--
+                  <li role="presentation"><a href="#">otra opcion</a></li>-->
+                </ul>
+                <a class="navbar-brand" href="#">
+                  <img alt="Brand" src="img/icon.ico" height="50" width="100">
+                </a>
+              </nav>
+              <h3 class="text-muted">MarkDis Bolivia</h3>
+              <p class="text-muted">Hola <label id="usuario"></label></p>
+        </div>
+        
+         <div class="jumbotron " >
+                <divclass="text-center">
+                    <h1>Descuentos Markdis</h1>
+                    
+                    <input type="number" id ="descu"class="form-control ng-pristine ng-valid-min ng-valid-max ng-invalid ng-invalid-required ng-touched ng-untouched" ng-model="descextra" style="width: 200px;margin-left: 40%;" required value="1" min="0" max="50"></input>
+                     <p></p>
+                    <a class="btn btn-warning btn-primary" ng-click="mostrarDescuentos()" style="margin-left: 15%;"> Agregar nuevo descuento </a>
+                   
+                </div>
+         </div>
+        
+        <div class="container">
+            
+            
+                
+            <ul class="list-group" >
+                
+                <li class="list-group-item" ng-repeat="decuento in descuentos " >  {{ decuento}} %</li>
+                
+            </ul>
+
+            
+                
+            
+        
+        
+        </div>
+        
+        <!-- Latest compiled and minified JavaScript -->
+        
+        
+        
+        <script>
+        
+            var bootstrapApp = angular.module( 'bootstrapApp' , [] )
+            
+            bootstrapApp.controller ( 'controladorDescuento' , [ '$scope' , function($scope){
+          
+                   
+                $scope.descuentos = [];
+                var db = window.openDatabase("markdisdb", "1.0", "Cordova Demo", 200000);
+                db.transaction(function desc(tx) {
+                  tx.executeSql('DROP TABLE IF EXISTS Descuento');
+
+                  tx.executeSql('CREATE TABLE IF NOT EXISTS Descuento (DESC  INTEGER UNIQUE);');
+                  
+                }, errorCB);
+                
+                
+                $scope.mostrarDescuentos = function(){
+
+                  if ($scope.descextra!=0) {
+                        $scope.descuentos.push( $scope.descextra )
+                        var db = window.openDatabase("markdisdb", "1.0", "Cordova Demo", 200000);
+                        db.transaction(function desc(tx) {
+                          
+                          tx.executeSql('INSERT INTO Descuento (DESC) VALUES ("'+$scope.descextra +'")');
+                        }, errorCB);
+                        $("#descu").val("");
+                  }
+                  else{
+                    alert("Usted agrego 0% de descuento, no es necesario, ya que viene incluido por defecto.");
+                  }
+                        
+                    
+                }
+                
+                
+          
+            }])
+
+            
+            
+            
+            
+        </script>
+</body>
+</html>
